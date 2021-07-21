@@ -7,7 +7,7 @@ import dash_html_components as html
 import plotly.express as px
 import pandas as pd
 
-from app import app
+from index import app
 from apps import upload
 
 def get_ranged(startdate, enddate):

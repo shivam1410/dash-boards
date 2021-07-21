@@ -6,7 +6,7 @@ import dash_html_components as html
 import plotly.graph_objects as go
 import pandas as pd
 
-from app import app
+from index import app
 from apps import upload
 
 def get_all_dates(df):
