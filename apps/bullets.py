@@ -37,7 +37,7 @@ def get_bullet_graph(startdate, enddate):
                     act_obj[activity].append(1)
             idx+=1 
         
-        # print(act_obj)
+        # print(act_obj)#
         # print(act_diff_obj)
         # colors=["Blue", "Crrimson"]
         fig = go.Figure()
