@@ -1,9 +1,10 @@
+from os import path
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import sleep, reading
+from apps import sleep, reading, bullets, Leisure, upload
 
 
 app.layout = html.Div([
@@ -15,10 +16,16 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               Input('url', 'pathname'))
 def display_page(pathname):
-    if pathname == '/apps/sleep':
+    if pathname == '/app/sleep':
         return sleep.layout
-    elif pathname == '/apps/read':
+    elif pathname == '/app/read':
         return reading.layout
+    elif pathname == '/app/bullets':
+        return bullets.layout
+    elif pathname == '/app/test':
+        return Leisure
+    elif pathname == '/app/upload':
+        return upload.layout
     else:
         return '404'
 
