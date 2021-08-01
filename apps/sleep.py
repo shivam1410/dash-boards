@@ -8,23 +8,23 @@ import plotly.express as px
 import pandas as pd
 
 from index import app
-from apps import upload
-def get_sleep_graph(startdate, enddate):
-    try:
-        df = pd.read_csv('csv/data.csv');
-        if(df.size > 0):
-            sleep_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
-            sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
-            date = sleep_df["Date"]
-            stime = pd.to_datetime(sleep_df["Start Time"])
-            etime = pd.to_datetime(sleep_df["End Time"])
+from apps.sheetService import getSheets, getSheetData
 
-            fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = date, 
-                            title= "Sleepdata")
-            fig.update_yaxes(autorange='reversed')
-            return fig;
-    except:
-        app.layout = upload.layout
+getSheets();
+df = getSheetData();
+
+def get_sleep_graph(startdate, enddate):
+    if(df.size > 0):
+        sleep_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
+        sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
+        date = sleep_df["Date"]
+        stime = pd.to_datetime(sleep_df["Start Time"])
+        etime = pd.to_datetime(sleep_df["End Time"])
+
+        fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = date, 
+                        title= "Sleepdata")
+        fig.update_yaxes(autorange='reversed')
+        return fig;
 
 layout = html.Div(
     id = 'Sleep-display-value',

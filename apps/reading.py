@@ -8,42 +8,37 @@ import plotly.express as px
 import pandas as pd
 
 from index import app
-from apps import upload
+from apps.sheetService import getSheets, getSheetData
+
+getSheets();
+df = getSheetData();
 
 def get_ranged(startdate, enddate):
-    try:
-        df = pd.read_csv('csv/data.csv');
-        read_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
-        return read_df
-    except:
-        app.layout = upload.layout
+    # df = pd.read_csv('csv/data.csv');
+
+    read_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
+    return read_df
 
 def get_all_graph(startdate, enddate, cat):
-    try:
-        # print(cat, len(cat))
-        read_df = get_ranged(startdate, enddate)
-        read_df = read_df[read_df["Category"].isin(cat)]
-        # print(len(read_df))
-        read_df["Time"] = pd.to_datetime(read_df["End Time"]) - pd.to_datetime(read_df["Start Time"])
-        fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= ", ".join(cat))
-        return fig
-    except:
-        app.layout = upload.layout
+    # print(cat, len(cat))
+    read_df = get_ranged(startdate, enddate)
+    read_df = read_df[read_df["Category"].isin(cat)]
+    # print(len(read_df))
+    read_df["Time"] = pd.to_datetime(read_df["End Time"]) - pd.to_datetime(read_df["Start Time"])
+    fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= ", ".join(cat))
+    return fig
 
 def get_single_graph(startdate, enddate, cat):
-    try:
-        # print(cat, len(cat))
-        read_df = get_ranged(startdate, enddate)
-        read_df = read_df[read_df["Category"] == cat[len(cat)-1]]
-        # print(len(read_df))
-        read_df["Time"] = pd.to_datetime(read_df["End Time"]) - pd.to_datetime(read_df["Start Time"])
-        fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= cat[len(cat)-1])
-        return fig
-    except:
-        app.layout = upload.layout
+    # print(cat, len(cat))
+    read_df = get_ranged(startdate, enddate)
+    read_df = read_df[read_df["Category"] == cat[len(cat)-1]]
+    # print(len(read_df))
+    read_df["Time"] = pd.to_datetime(read_df["End Time"]) - pd.to_datetime(read_df["Start Time"])
+    fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= cat[len(cat)-1])
+    return fig
 
 layout = html.Div(
-    # id = 'read-display-value',
+    id = 'read-display-value',
     children=[
         html.H3(children='Read Data'),
         dcc.Dropdown(
@@ -68,9 +63,6 @@ layout = html.Div(
         dcc.Graph(
             id='single-data',
             figure=get_single_graph("2017-08-01", "2021-06-18", ["Read"])
-        ),
-        html.Div(
-         id= 'some-div'   
         )
     ]
 )
@@ -92,10 +84,3 @@ def filter_output(start_date, end_date, value):
 def filter_output(start_date, end_date, value):
     fig = get_single_graph(start_date, end_date, value)
     return fig
-
-@app.callback(
-    Output('some-div', 'children'),
-    [Input('skills_dropdown', 'value')])
-def output(value):
-    # print(value)
-    return 'You have selected "{}"'.format(value)
