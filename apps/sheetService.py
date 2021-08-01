@@ -1,4 +1,3 @@
-import asyncio
 from auth.sheetAuth import getSheetService
 import pandas as pd
 SAMPLE_SPREADSHEET_ID = '18n86FnoHeqY1HCvaSHPXf2vbzjDZmw2gcO1Iv2XeD0Y'
