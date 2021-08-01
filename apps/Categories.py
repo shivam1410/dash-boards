@@ -13,15 +13,19 @@ getSheets();
 df = getSheetData();
 
 Categories = {
-    "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep"],
+    # "Eating" always comes with other activity like Film, music, Friends
+    # Hence, It should'nt be quantified in time duration
+    "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep", "Office call", "office Work"],
     "Actions": ["Inside Task", "Outside Task", "Travel"],
-    "Work": ["Office call", "office Work"],
-    "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
-    "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
-    "Entertainment": ["Film", "Youtube", "Music"],
-    "Learning": ["Research", "Information", "Study", "Coding"],
+    # "Work": ["Office call", "office Work"],
+    # "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
+    # "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
+    # "Entertainment": ["Film", "Youtube", "Music"],
+    "Pseudo Leisure": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate", "Film", "Youtube", "Music", ],
+    "Learning": ["Research", "Information", "Study", "Coding", "Sketch", "Ukulele", "Read", "Meditation", "Plants", "Writing", "Time Tracker", "Expense", "Thinking"],
+    # "Learning": ["Research", "Information", "Study", "Coding"],
     "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"],
-    "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
+    # "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
 }
 
 def get_all_dates(df):
