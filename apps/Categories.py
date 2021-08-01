@@ -13,7 +13,7 @@ getSheets();
 df = getSheetData();
 
 Categories = {
-    "Fundamental": ["Sleep", "Exercise", "Extra", "Eating", "Not-Sleep"],
+    "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep"],
     "Actions": ["Inside Task", "Outside Task", "Travel"],
     "Work": ["Office call", "office Work"],
     "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
