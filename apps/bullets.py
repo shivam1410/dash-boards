@@ -9,8 +9,8 @@ import pandas as pd
 from index import app
 from apps.sheetService import getSheets, getSheetData
 
-defaultActivities = ["Read", "Sketch", "Coding", "Meditation", "office Work", "Exercise"]
-allActivityAllowedtoShowInBullet = defaultActivities + ["Writing", "Masturbate"]
+defaultActivities = ["Read", "Meditation", "office Work", "Exercise", "Coding"]
+allActivityAllowedtoShowInBullet = defaultActivities + ["Study", "Writing", "Masturbate"]
 getSheets();
 df = getSheetData();
 
