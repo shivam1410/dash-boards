@@ -9,6 +9,8 @@ import pandas as pd
 from index import app
 from apps.sheetService import getSheets, getSheetData
 
+defaultActivities = ["Read", "Sketch", "Coding", "Meditation", "office Work", "Exercise"]
+allActivityAllowedtoShowInBullet = defaultActivities + ["Writing", "Masturbate"]
 getSheets();
 df = getSheetData();
 
@@ -16,11 +18,11 @@ def get_all_dates(df):
     dates = df["Date"].unique()
     return dates;
 
-def get_bullet_graph(startdate, enddate):
+def get_bullet_graph(startdate, enddate, Activities = defaultActivities):
     # df = pd.read_csv('csv/data.csv');
     # print(df)
     bullet_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d'))]
-    Activities = ["Read", "Masturbate", "Sketch", "Coding", "Meditation", "office Work", "Writing"]
+    # Activities = ["Read", "Masturbate", "Sketch", "Coding", "Meditation", "office Work", "Exercise"]
     dates = get_all_dates(bullet_df)
     
     # {
@@ -62,6 +64,12 @@ layout = html.Div(
     id = 'Bullet-Graphs',
     children=[
         html.H3(children='Activity Data'),
+        dcc.Dropdown(
+            id="bullets_dropdown",
+            options = [ {'label': i, 'value':i} for i in allActivityAllowedtoShowInBullet],
+            multi =True,
+            value = defaultActivities
+        ),
         dcc.DatePickerRange(
             id='bullet-date-picker',
             min_date_allowed=date(1995, 8, 5),
@@ -82,7 +90,8 @@ layout = html.Div(
 @app.callback(
     Output('bullet-data', 'figure'),
     [Input('bullet-date-picker', 'start_date'),
-     Input('bullet-date-picker', 'end_date')])
-def update_output(start_date, end_date):
-    fig = get_bullet_graph(start_date, end_date)
+     Input('bullet-date-picker', 'end_date'),
+     Input('bullets_dropdown', 'value')])
+def update_output(start_date, end_date, value):
+    fig = get_bullet_graph(start_date, end_date, value)
     return fig

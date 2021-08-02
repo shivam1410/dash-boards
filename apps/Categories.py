@@ -61,6 +61,10 @@ def get_Category_graph(startdate, enddate):
 
     ########### Creating Graphs
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "Sunburst"}]])
+    # hover_data = []
+    # for a in Categories.values():
+    #     b = ', '.join(a) 
+    #     hover_data.append(b)
 
     fig1 = px.pie(values=cat_obj.values(), names=cat_obj.keys())
     fig2 = px.sunburst(
