@@ -9,8 +9,7 @@ from plotly.subplots import make_subplots
 from index import app
 from apps.sheetService import getSheets, getSheetData
 
-getSheets();
-df = getSheetData();
+# getSheets();
 
 Categories = {
     # "Eating" always comes with other activity like Film, music, Friends
@@ -33,6 +32,8 @@ def get_all_dates(df):
     return dates;
 
 def get_Category_graph(startdate, enddate):
+    df = getSheetData();
+
     Category_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d'))]
     # Category_df = df
     # print(Category_df)
@@ -60,17 +61,17 @@ def get_Category_graph(startdate, enddate):
     ########### Creating datasets
 
     ########### Creating Graphs
-    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "Sunburst"}]])
+    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "sunburst"}]])
     # hover_data = []
     # for a in Categories.values():
     #     b = ', '.join(a) 
     #     hover_data.append(b)
 
-    fig1 = px.pie(values=cat_obj.values(), names=cat_obj.keys())
+    fig1 = px.pie(heirarchical_df, names='Category', values='Duration')
     fig2 = px.sunburst(
-        heirarchical_df,
-        path=["Category", "Activity"],
-        values="Duration"
+            heirarchical_df,
+            path=["Category", "Activity"],
+            values="Duration"
         )
     fig.add_trace(fig1['data'][0], row=1, col=1)
     fig.add_trace(fig2['data'][0], row=1, col=2)
@@ -81,6 +82,7 @@ def get_Category_graph(startdate, enddate):
 layout = html.Div(
     id = 'Category-Graphs',
     children=[
+        html.Hr(),  # horizontal line
         html.H3(children='Life spent on things from...'),
         dcc.DatePickerRange(
             id='Category-date-picker',

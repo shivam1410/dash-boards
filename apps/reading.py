@@ -10,12 +10,11 @@ import pandas as pd
 from index import app
 from apps.sheetService import getSheets, getSheetData
 
-getSheets();
-df = getSheetData();
+# getSheets();
 
 def get_ranged(startdate, enddate):
     # df = pd.read_csv('csv/data.csv');
-
+    df = getSheetData();
     read_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
     return read_df
 
@@ -40,6 +39,7 @@ def get_single_graph(startdate, enddate, cat):
 layout = html.Div(
     id = 'read-display-value',
     children=[
+        html.Hr(),  # horizontal line
         html.H3(children='Read Data'),
         dcc.Dropdown(
             id="skills_dropdown",
