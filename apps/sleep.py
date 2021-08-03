@@ -10,10 +10,10 @@ import pandas as pd
 from index import app
 from apps.sheetService import getSheets, getSheetData
 
-getSheets();
-df = getSheetData();
+# getSheets();
 
 def get_sleep_graph(startdate, enddate):
+    df = getSheetData();
     if(df.size > 0):
         sleep_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
         sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
@@ -29,6 +29,7 @@ def get_sleep_graph(startdate, enddate):
 layout = html.Div(
     id = 'Sleep-display-value',
     children=[
+        html.Hr(),  # horizontal line
         html.H3(children='Sleep Data'),
         html.Div(children = [
             dcc.DatePickerRange(

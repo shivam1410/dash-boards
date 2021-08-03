@@ -11,8 +11,9 @@ from apps.sheetService import getSheets, getSheetData
 
 defaultActivities = ["Read", "Meditation", "office Work", "Exercise", "Coding"]
 allActivityAllowedtoShowInBullet = defaultActivities + ["Study", "Writing", "Masturbate"]
-getSheets();
+# getSheets();
 df = getSheetData();
+print(df)
 
 def get_all_dates(df):
     dates = df["Date"].unique()
@@ -21,10 +22,11 @@ def get_all_dates(df):
 def get_bullet_graph(startdate, enddate, Activities = defaultActivities):
     # df = pd.read_csv('csv/data.csv');
     # print(df)
+    df = getSheetData();
     bullet_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d'))]
     # Activities = ["Read", "Masturbate", "Sketch", "Coding", "Meditation", "office Work", "Exercise"]
     dates = get_all_dates(bullet_df)
-    
+    # print(dates)
     # {
     #   "activity" : [1,0,1,0]
     # }
@@ -63,7 +65,8 @@ def get_bullet_graph(startdate, enddate, Activities = defaultActivities):
 layout = html.Div(
     id = 'Bullet-Graphs',
     children=[
-        html.H3(children='Activity Data'),
+        html.Hr(),  # horizontal line
+        html.H3(children='Bullet Data'),
         dcc.Dropdown(
             id="bullets_dropdown",
             options = [ {'label': i, 'value':i} for i in allActivityAllowedtoShowInBullet],
