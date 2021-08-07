@@ -1,35 +1,37 @@
-
-from datetime import datetime, date, timedelta
+# Dash dependecies
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 
+# Python dependecies
+from datetime import datetime, date, timedelta
 import plotly.express as px
 import pandas as pd
 
+# Custom dependencies
 from index import app
-from apps.sheetService import getSheets, getSheetData
+from apps.sheetService import getSheetData, get_ranged_sheet_data
 
-# getSheets();
 
 def get_sleep_graph(startdate, enddate):
-    df = getSheetData();
-    if(df.size > 0):
-        sleep_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d' ))]
-        sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
-        date = sleep_df["Date"]
-        stime = pd.to_datetime(sleep_df["Start Time"])
-        etime = pd.to_datetime(sleep_df["End Time"])
+    sleep_df = get_ranged_sheet_data(startdate, enddate);
+    ############# Creating Dataset
+    sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
+    date = sleep_df["Date"]
+    stime = pd.to_datetime(sleep_df["Start Time"])
+    etime = pd.to_datetime(sleep_df["End Time"])
+    ############# Creating Dataset
 
-        fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = date, 
-                        title= "Sleepdata")
-        fig.update_yaxes(autorange='reversed')
-        return fig;
+    ############# Creating Graphs
+    fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = date)
+    fig.update_yaxes(autorange='reversed')
+    return fig;
 
 layout = html.Div(
     id = 'Sleep-display-value',
     children=[
-        html.Hr(),  # horizontal line
+        html.Hr(style={'padding-top':"30px"}),  # horizontal line
         html.H3(children='Sleep Data'),
         html.Div(children = [
             dcc.DatePickerRange(
@@ -39,6 +41,18 @@ layout = html.Div(
                 initial_visible_month=date.today(),
                 start_date = date.today() - timedelta(7),
                 end_date= date.today()
+            ),
+            dbc.RadioItems(
+                id="sleep-data-range",
+                className="btn-group",
+                labelClassName="btn btn-secondary",
+                labelCheckedClassName="active",
+                options=[
+                    {"label": "7 days", "value": "week"},
+                    {"label": "30 days", "value": "month"},
+                    {"label": "All time", "value": "all"},
+                ],
+                value="week",
             ),
             html.Div(id='output-container-date-picker-range'),
             dcc.Graph(
@@ -56,3 +70,16 @@ layout = html.Div(
 def update_output(start_date, end_date):
     fig = get_sleep_graph(start_date, end_date)
     return fig
+
+# Callback for option button['week', 'month', 'all'], changing date in datepicker 
+@app.callback(
+    Output('sleep-date-picker', 'start_date'),
+    [Input('sleep-data-range', 'value')])
+def update_datepicker(value):
+    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
+    if(value == "month"):
+        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+    if(value == 'week'):
+        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+    else:
+        return (date(2021, 2, 1)).strftime('%Y-%m-%d');

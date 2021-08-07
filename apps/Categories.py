@@ -1,29 +1,32 @@
-from datetime import datetime, date
+# Dash dependecies
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 
+# Python dependecies
+from datetime import datetime, date, timedelta
+from plotly.subplots import make_subplots
 import plotly.express as px
 import pandas as pd
-from plotly.subplots import make_subplots
+
+# Custom dependencies
 from index import app
-from apps.sheetService import getSheets, getSheetData
+from apps.sheetService import getSheetData, get_ranged_sheet_data
 
-# getSheets();
-
-Categories = {
+CATEGORIES = {
     # "Eating" always comes with other activity like Film, music, Friends
     # Hence, It should'nt be quantified in time duration
     "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep", "Office call", "office Work"],
     "Actions": ["Inside Task", "Outside Task", "Travel"],
+    "Pseudo Leisure": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate", "Film", "Youtube", "Music", ],
+    "Learning": ["Research", "Information", "Study", "Coding", "Sketch", "Ukulele", "Read", "Meditation", "Plants", "Writing", "Time Tracker", "Expense", "Thinking"],
+    "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"],
     # "Work": ["Office call", "office Work"],
     # "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
     # "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
     # "Entertainment": ["Film", "Youtube", "Music"],
-    "Pseudo Leisure": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate", "Film", "Youtube", "Music", ],
-    "Learning": ["Research", "Information", "Study", "Coding", "Sketch", "Ukulele", "Read", "Meditation", "Plants", "Writing", "Time Tracker", "Expense", "Thinking"],
     # "Learning": ["Research", "Information", "Study", "Coding"],
-    "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"],
     # "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
 }
 
@@ -31,14 +34,14 @@ def get_all_dates(df):
     dates = df["Date"].unique()
     return dates;
 
+def get_hours(time: timedelta):
+    _time = time.total_seconds()/3600
+    return _time
+
 def get_Category_graph(startdate, enddate):
-    df = getSheetData();
+    Category_df = get_ranged_sheet_data(startdate, enddate);
 
-    Category_df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d'))]
-    # Category_df = df
-    # print(Category_df)
-
-    ########### Creating datasets
+    ############# Creating datasets
     # cat_obj = {
     #   "activity" : 0 days 00:14:00,
     #   ...
@@ -46,32 +49,35 @@ def get_Category_graph(startdate, enddate):
     # heirarchical_df = [["Fundamental", "Sleep", 58 days 18:56:00], ...]
     cat_obj = {}
     heirarchical_df=[];
-    for key in Categories:
+    for key in CATEGORIES:
         DurationForOneCategory = [];
-        for activity in Categories[key]:
+        for activity in CATEGORIES[key]:
             activityObject = Category_df[(Category_df.Category == activity)]; # taking single activity
             # Calculating sum  of all instances of that single activity
             durationForOneActivity = (pd.to_datetime(activityObject["End Time"]) - pd.to_datetime(activityObject["Start Time"])).sum();
             # Duration for one category contain duration of multiple activity
-            DurationForOneCategory.append(durationForOneActivity);
-            heirarchical_df.append([key,activity,durationForOneActivity])
-        cat_obj[key] = pd.Series(DurationForOneCategory).sum();
+            hours = get_hours(durationForOneActivity)
+            DurationForOneCategory.append(hours);
+            heirarchical_df.append([key,activity,hours])
+        cat_obj[key] = pd.Series(DurationForOneCategory).sum()
 
-    heirarchical_df = pd.DataFrame(heirarchical_df, columns=["Category","Activity","Duration"]);
-    ########### Creating datasets
+    heirarchical_df = pd.DataFrame(heirarchical_df, columns=["Category","Activity","Hours"]);
+    print(heirarchical_df)
+    ############# Creating datasets
 
-    ########### Creating Graphs
+    ############# Creating Graphs
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "sunburst"}]])
     # hover_data = []
-    # for a in Categories.values():
+    # for a in CATEGORIES.values():
     #     b = ', '.join(a) 
     #     hover_data.append(b)
 
-    fig1 = px.pie(heirarchical_df, names='Category', values='Duration')
+    fig1 = px.pie(heirarchical_df, names='Category', values='Hours')
     fig2 = px.sunburst(
             heirarchical_df,
             path=["Category", "Activity"],
-            values="Duration"
+            values="Hours",
+            hover_name="Hours"
         )
     fig.add_trace(fig1['data'][0], row=1, col=1)
     fig.add_trace(fig2['data'][0], row=1, col=2)
@@ -82,17 +88,32 @@ def get_Category_graph(startdate, enddate):
 layout = html.Div(
     id = 'Category-Graphs',
     children=[
-        html.Hr(),  # horizontal line
-        html.H3(children='Life spent on things from...'),
-        dcc.DatePickerRange(
-            id='Category-date-picker',
-            min_date_allowed=date(1995, 8, 5),
-            max_date_allowed=date.today(),
-            initial_visible_month=date.today(),
-            start_date = date(2021, 2, 1),
-            end_date= date.today()
-        ),
-        html.Div(id='output-container-date-picker-range'),
+        html.Hr(style={'padding-top':"30px"}),  # horizontal line
+        html.H3(children='Life spent on things from...',className="header"),
+        html.Div(children=[
+            dcc.DatePickerRange(
+                id='Category-date-picker',
+                min_date_allowed=date(1995, 8, 5),
+                max_date_allowed=date.today(),
+                initial_visible_month=date.today(),
+                start_date = date(2021, 2, 1),
+                end_date= date.today()
+            ),
+            dbc.RadioItems(
+                id="category-data-range",
+                className="btn-group",
+                labelClassName="btn btn-secondary",
+                labelCheckedClassName="active",
+                options=[
+                    {"label": "7 days", "value": "week"},
+                    {"label": "30 days", "value": "month"},
+                    {"label": "All time", "value": "all"},
+                ],
+                value="week",
+            )
+        ]),
+        
+        html.Div(id='category-time-selection'),
         dcc.Graph(
             id='Category-data',
             figure=get_Category_graph((date(2021, 2, 1)).strftime('%Y-%m-%d'), (date.today()).strftime('%Y-%m-%d'))
@@ -108,3 +129,16 @@ layout = html.Div(
 def update_output(start_date, end_date):
     fig = get_Category_graph(start_date, end_date)
     return fig
+
+# Callback for option button['week', 'month', 'all'], changing date in datepicker 
+@app.callback(
+    Output('Category-date-picker', 'start_date'),
+    [Input('category-data-range', 'value')])
+def update_datepicker(value):
+    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
+    if(value == "month"):
+        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+    if(value == 'week'):
+        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+    else:
+        return (date(2021, 2, 1)).strftime('%Y-%m-%d');
