@@ -1,14 +1,11 @@
+# Dash dependecies
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import os
-import datetime as dt
-import pandas as pd
+
+# Custom dependecies
 from index import app
 from apps import main
-from apps.sheetService import getSheets
-
-
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -25,5 +22,5 @@ def display_page(pathname):
         return '404'
 
 if __name__ == '__main__':
-    # app.run_server()
     app.run_server()
+    # app.run_server()
