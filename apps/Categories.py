@@ -5,14 +5,15 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 # Python dependecies
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 from plotly.subplots import make_subplots
 import plotly.express as px
 import pandas as pd
 
 # Custom dependencies
 from index import app
-from apps.sheetService import getSheetData, get_ranged_sheet_data
+from .sheetService import get_ranged_sheet_data
+from .misc import *
 
 CATEGORIES = {
     # "Eating" always comes with other activity like Film, music, Friends
@@ -21,23 +22,19 @@ CATEGORIES = {
     "Actions": ["Inside Task", "Outside Task", "Travel"],
     "Pseudo Leisure": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate", "Film", "Youtube", "Music", ],
     "Learning": ["Research", "Information", "Study", "Coding", "Sketch", "Ukulele", "Read", "Meditation", "Plants", "Writing", "Time Tracker", "Expense", "Thinking"],
-    "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"],
-    # "Work": ["Office call", "office Work"],
-    # "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
-    # "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
-    # "Entertainment": ["Film", "Youtube", "Music"],
-    # "Learning": ["Research", "Information", "Study", "Coding"],
-    # "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
+    "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"]
 }
-
-def get_all_dates(df):
-    dates = df["Date"].unique()
-    return dates;
-
-def get_hours(time: timedelta):
-    _time = time.total_seconds()/3600
-    return _time
-
+# CATEGORIES_temp = {
+#     "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep"],
+#     "Actions": ["Inside Task", "Outside Task", "Travel"],
+#     "Work": ["Office call", "office Work"],
+#     "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
+#     "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
+#     "Entertainment": ["Film", "Youtube", "Music"],
+#     "Learning": ["Research", "Information", "Study", "Coding"],
+#     "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
+#     "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"]
+# }
 def get_Category_graph(startdate, enddate):
     Category_df = get_ranged_sheet_data(startdate, enddate);
 
@@ -62,16 +59,10 @@ def get_Category_graph(startdate, enddate):
         cat_obj[key] = pd.Series(DurationForOneCategory).sum()
 
     heirarchical_df = pd.DataFrame(heirarchical_df, columns=["Category","Activity","Hours"]);
-    print(heirarchical_df)
     ############# Creating datasets
 
     ############# Creating Graphs
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "sunburst"}]])
-    # hover_data = []
-    # for a in CATEGORIES.values():
-    #     b = ', '.join(a) 
-    #     hover_data.append(b)
-
     fig1 = px.pie(heirarchical_df, names='Category', values='Hours')
     fig2 = px.sunburst(
             heirarchical_df,
@@ -116,12 +107,12 @@ layout = html.Div(
         html.Div(id='category-time-selection'),
         dcc.Graph(
             id='Category-data',
-            figure=get_Category_graph((date(2021, 2, 1)).strftime('%Y-%m-%d'), (date.today()).strftime('%Y-%m-%d'))
+            figure=get_Category_graph((date.today() - timedelta(6)).strftime('%Y-%m-%d'), (date.today()).strftime('%Y-%m-%d'))
         )
     ]
 )
 
-
+# Callback for DatePicker 
 @app.callback(
     Output('Category-data', 'figure'),
     [Input('Category-date-picker', 'start_date'),
@@ -135,10 +126,9 @@ def update_output(start_date, end_date):
     Output('Category-date-picker', 'start_date'),
     [Input('category-data-range', 'value')])
 def update_datepicker(value):
-    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
     if(value == "month"):
-        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+        return (date.today()- timedelta(30));
     if(value == 'week'):
-        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+        return (date.today() - timedelta(6));
     else:
-        return (date(2021, 2, 1)).strftime('%Y-%m-%d');
+        return (date(2021, 2, 1));

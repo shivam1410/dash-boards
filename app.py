@@ -22,5 +22,5 @@ def display_page(pathname):
         return '404'
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
     # app.run_server()

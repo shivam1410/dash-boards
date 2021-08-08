@@ -5,17 +5,17 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 # Python dependecies
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 import plotly.express as px
 import pandas as pd
 import numpy as np
 
 # Custom dependencies
 from index import app
-from apps.sheetService import getSheetData, get_ranged_sheet_data
+from .sheetService import get_ranged_sheet_data  
 
 
-def get_all_graph(startdate, enddate, cat):
+def get_graph_for_multiple_skills(startdate, enddate, cat):
     read_df = get_ranged_sheet_data(startdate, enddate);
     ############# Creating Dataset
     read_df = read_df[read_df["Category"].isin(cat)]
@@ -27,7 +27,7 @@ def get_all_graph(startdate, enddate, cat):
     fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= ", ".join(cat))
     return fig
 
-def get_single_graph(startdate, enddate, cat):
+def get_graph_for_single_skills(startdate, enddate, cat):
     read_df = get_ranged_sheet_data(startdate, enddate);
     # Creating Dataset
     read_df = read_df[read_df["Category"] == cat[len(cat)-1]]
@@ -73,11 +73,11 @@ layout = html.Div(
         html.Div(id='output-container-date-picker-range'),
         dcc.Graph(
             id='all-data',
-            figure=get_all_graph("2017-08-01", "2021-06-18", ["Read"])
+            figure=get_graph_for_multiple_skills((date.today() - timedelta(6)).strftime('%Y-%m-%d'), (date.today()).strftime('%Y-%m-%d'), ["Read"])
         ),
         dcc.Graph(
             id='single-data',
-            figure=get_single_graph("2017-08-01", "2021-06-18", ["Read"])
+            figure=get_graph_for_single_skills((date.today() - timedelta(6)).strftime('%Y-%m-%d'), (date.today()).strftime('%Y-%m-%d'), ["Read"])
         )
     ]
 )
@@ -88,7 +88,7 @@ layout = html.Div(
      Input('read-date-picker', 'end_date'),
      Input('skills_dropdown', 'value')])
 def filter_output(start_date, end_date, value):
-    fig = get_all_graph(start_date, end_date, value)
+    fig = get_graph_for_multiple_skills(start_date, end_date, value)
     return fig
 
 @app.callback(
@@ -97,7 +97,7 @@ def filter_output(start_date, end_date, value):
      Input('read-date-picker', 'end_date'),
      Input('skills_dropdown', 'value')])
 def filter_output(start_date, end_date, value):
-    fig = get_single_graph(start_date, end_date, value)
+    fig = get_graph_for_single_skills(start_date, end_date, value)
     return fig
 
 # Callback for option button['week', 'month', 'all'], changing date in datepicker 
@@ -105,10 +105,9 @@ def filter_output(start_date, end_date, value):
     Output('read-date-picker', 'start_date'),
     [Input('read-data-range', 'value')])
 def update_datepicker(value):
-    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
     if(value == "month"):
-        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+        return (date.today()- timedelta(30));
     if(value == 'week'):
-        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+        return (date.today() - timedelta(6));
     else:
-        return (date(2021, 2, 1)).strftime('%Y-%m-%d');
+        return (date(2021, 2, 1));

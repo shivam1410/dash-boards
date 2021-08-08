@@ -5,13 +5,13 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 # Python dependecies
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 import plotly.express as px
 import pandas as pd
 
 # Custom dependencies
 from index import app
-from apps.sheetService import getSheetData, get_ranged_sheet_data
+from .sheetService import get_ranged_sheet_data
 
 
 def get_sleep_graph(startdate, enddate):
@@ -57,7 +57,7 @@ layout = html.Div(
             html.Div(id='output-container-date-picker-range'),
             dcc.Graph(
                 id='Sleep-data',
-                figure=get_sleep_graph("2017-08-01", "2021-06-18")
+                figure=get_sleep_graph((date.today() - timedelta(6)).strftime('%Y-%m-%d'), date.today().strftime('%Y-%m-%d'))
             )
         ]),
     ]
@@ -76,10 +76,9 @@ def update_output(start_date, end_date):
     Output('sleep-date-picker', 'start_date'),
     [Input('sleep-data-range', 'value')])
 def update_datepicker(value):
-    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
     if(value == "month"):
-        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+        return (date.today()- timedelta(30));
     if(value == 'week'):
-        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+        return (date.today() - timedelta(6));
     else:
-        return (date(2021, 2, 1)).strftime('%Y-%m-%d');
+        return (date(2021, 2, 1));
