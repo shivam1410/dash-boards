@@ -6,19 +6,16 @@ import dash_bootstrap_components as dbc
 
 # Python dependecies
 import plotly.graph_objects as go
-from datetime import datetime, date, timedelta
-import pandas as pd
+from datetime import date, timedelta
 
 # Custom dependencies
 from index import app
-from apps.sheetService import getSheetData, get_ranged_sheet_data
+from .sheetService import get_ranged_sheet_data
+from .misc import *
 
 ACTIVITIES = ["Read", "Meditation", "office Work", "Exercise", "Coding"]
 ALL_ACTIVITIES = ACTIVITIES + ["Study", "Writing", "Masturbate"]
 
-def get_all_dates(df):
-    dates = df["Date"].unique()
-    return dates;
 
 def get_bullet_graph(startdate, enddate, Activities = ACTIVITIES):
     bullet_df = get_ranged_sheet_data(startdate, enddate);
@@ -115,10 +112,9 @@ def update_output(start_date, end_date, value):
     Output('bullet-date-picker', 'start_date'),
     [Input('bullet-data-range', 'value')])
 def update_datepicker(value):
-    print((date.today()  - timedelta(30)).strftime('%Y-%m-%d'))
     if(value == "month"):
-        return ((date.today()- timedelta(30)).strftime('%Y-%m-%d'));
+        return (date.today()- timedelta(30));
     if(value == 'week'):
-        return ((date.today() - timedelta(6)).strftime('%Y-%m-%d'));
+        return (date.today() - timedelta(6));
     else:
-        return (date(2021, 2, 1)).strftime('%Y-%m-%d');
+        return date(2021, 2, 1);

@@ -36,5 +36,7 @@ def getSheetData():
 
 def get_ranged_sheet_data(startdate, enddate):
     df = getSheetData();
+    # strftime ====> { Date Object } => "string"
+    # strptime ====> "string" => { Date object }
     df = df[(pd.to_datetime(df.Date)>=datetime.strptime(startdate, '%Y-%m-%d'))&(pd.to_datetime(df.Date)<=datetime.strptime(enddate,'%Y-%m-%d'))]
     return df;
