@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 
 # Python dependecies
 import plotly.graph_objects as go
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 # Custom dependencies
 from index import app
@@ -110,11 +110,14 @@ def update_output(start_date, end_date, value):
 # Callback for option button['week', 'month', 'all'], changing date in datepicker 
 @app.callback(
     Output('bullet-date-picker', 'start_date'),
-    [Input('bullet-data-range', 'value')])
-def update_datepicker(value):
+    [Input('bullet-date-picker', 'end_date'),
+    Input('bullet-data-range', 'value')])
+def update_datepicker(end_date, value):
+    # To find 7days, 30 days before end_date
+    enddate = date.fromisoformat(end_date);
     if(value == "month"):
-        return (date.today()- timedelta(30));
+        return (enddate - timedelta(30));
     if(value == 'week'):
-        return (date.today() - timedelta(6));
+        return (enddate - timedelta(6));
     else:
         return date(2021, 2, 1);

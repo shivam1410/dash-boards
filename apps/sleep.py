@@ -5,7 +5,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 # Python dependecies
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 import plotly.express as px
 import pandas as pd
 
@@ -18,14 +18,28 @@ def get_sleep_graph(startdate, enddate):
     sleep_df = get_ranged_sheet_data(startdate, enddate);
     ############# Creating Dataset
     sleep_df = sleep_df[(sleep_df.Category== "Sleep")]
-    date = sleep_df["Date"]
+    dates = sleep_df["Date"]
     stime = pd.to_datetime(sleep_df["Start Time"])
     etime = pd.to_datetime(sleep_df["End Time"])
     ############# Creating Dataset
 
     ############# Creating Graphs
-    fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = date)
+    fig = px.timeline(sleep_df, x_start = stime, x_end = etime, y = dates)
     fig.update_yaxes(autorange='reversed')
+    # to add lines and distinction in graph
+    today = date.today()
+    initial_time=   datetime.combine(today,time(22,00,00))
+    mid_time_0    =   datetime.combine(today,time(00,00,00))
+    mid_time_1    =   datetime.combine(today,time(23,59,59))
+    final_time  =   datetime.combine(today,time(7,00,00))
+    fig.add_vline(x=initial_time, line_dash="dot",)
+    fig.add_vline(x=final_time, line_dash="dot",)
+    fig.add_vrect(x0=final_time, x1=mid_time_0, row="all", col=1,
+              annotation_text="", annotation_position="top left",
+              fillcolor="green", opacity=0.25, line_width=0)
+    fig.add_vrect(x0=mid_time_1, x1=initial_time, row="all", col=1,
+              annotation_text="", annotation_position="top left",
+              fillcolor="green", opacity=0.25, line_width=0)
     return fig;
 
 layout = html.Div(
@@ -74,11 +88,14 @@ def update_output(start_date, end_date):
 # Callback for option button['week', 'month', 'all'], changing date in datepicker 
 @app.callback(
     Output('sleep-date-picker', 'start_date'),
-    [Input('sleep-data-range', 'value')])
-def update_datepicker(value):
+    [Input('sleep-date-picker', 'end_date'),
+    Input('sleep-data-range', 'value')])
+def update_datepicker(end_date, value):
+    # To find 7days, 30 days before end_date
+    enddate = date.fromisoformat(end_date);
     if(value == "month"):
-        return (date.today()- timedelta(30));
+        return (enddate - timedelta(30));
     if(value == 'week'):
-        return (date.today() - timedelta(6));
+        return (enddate - timedelta(6));
     else:
-        return (date(2021, 2, 1));
+        return date(2021, 2, 1);

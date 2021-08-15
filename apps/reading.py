@@ -103,11 +103,14 @@ def filter_output(start_date, end_date, value):
 # Callback for option button['week', 'month', 'all'], changing date in datepicker 
 @app.callback(
     Output('read-date-picker', 'start_date'),
-    [Input('read-data-range', 'value')])
-def update_datepicker(value):
+    [Input('read-date-picker', 'end_date'),
+    Input('read-data-range', 'value')])
+def update_datepicker(end_date, value):
+    # To find 7days, 30 days before end_date
+    enddate = date.fromisoformat(end_date);
     if(value == "month"):
-        return (date.today()- timedelta(30));
+        return (enddate - timedelta(30));
     if(value == 'week'):
-        return (date.today() - timedelta(6));
+        return (enddate - timedelta(6));
     else:
-        return (date(2021, 2, 1));
+        return date(2021, 2, 1);
