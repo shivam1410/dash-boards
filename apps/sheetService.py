@@ -16,7 +16,6 @@ cache = Cache(app.server, config={
 
 
 TIMEOUT = 60
-
 @cache.memoize(timeout=TIMEOUT)
 def getSheets():
     service = getSheetService()

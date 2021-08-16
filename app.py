@@ -11,6 +11,7 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+# Creating server for Heroku deployment
 server = app.server
 
 @app.callback(Output('page-content', 'children'),
