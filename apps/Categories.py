@@ -68,8 +68,11 @@ def get_Category_graph(startdate, enddate):
             heirarchical_df,
             path=["Category", "Activity"],
             values="Hours",
-            hover_name="Hours"
+            hover_name="Hours",
+            names='Category'
         )
+    fig1.update_traces(direction="clockwise", rotation=90)
+    fig2.update_traces(rotation=180) 
     fig.add_trace(fig1['data'][0], row=1, col=1)
     fig.add_trace(fig2['data'][0], row=1, col=2)
     fig.update_layout(margin=dict(t=10, b=10, r=10, l=10))
