@@ -3,6 +3,7 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import plotly.io as pio
 
 # Python dependecies
 import plotly.graph_objects as go
@@ -12,9 +13,7 @@ from datetime import date, timedelta, datetime
 from index import app
 from .sheetService import get_ranged_sheet_data
 from .misc import *
-
-ACTIVITIES = ["Read", "Meditation", "office Work", "Exercise", "Coding"]
-ALL_ACTIVITIES = ACTIVITIES + ["Study", "Writing", "Masturbate"]
+from Constants.sheetConstants import *
 
 
 def get_bullet_graph(startdate, enddate, Activities = ACTIVITIES):
@@ -53,21 +52,22 @@ def get_bullet_graph(startdate, enddate, Activities = ACTIVITIES):
                 # marker_color=colors[],
                 name=key
             ))
-
-    fig.update_layout( barmode="stack")
+    fig.update_layout(template=THEME)
+    fig.update_layout(barmode="stack")
     return fig;
 
 
 layout = html.Div(
     id = 'Bullet-Graphs',
     children=[
-        html.Hr(style={'padding-top':"30px"}),  # horizontal line
+        html.Hr(),  # horizontal line
         html.H3(children='Bullet Data'),
         dcc.Dropdown(
             id="bullets_dropdown",
             options = [ {'label': i, 'value':i} for i in ALL_ACTIVITIES],
             multi =True,
-            value = ACTIVITIES
+            value = ACTIVITIES,
+            className="dash-bootstrap"
         ),
         dcc.DatePickerRange(
             id='bullet-date-picker',
@@ -75,7 +75,8 @@ layout = html.Div(
             max_date_allowed=date.today(),
             initial_visible_month=date.today(),
             start_date = date.today() - timedelta(30),
-            end_date= date.today()
+            end_date= date.today(),
+            className="dash-bootstrap"
         ),
         dbc.RadioItems(
                 id="bullet-data-range",

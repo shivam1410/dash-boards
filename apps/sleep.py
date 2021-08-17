@@ -12,6 +12,7 @@ import pandas as pd
 # Custom dependencies
 from index import app
 from .sheetService import get_ranged_sheet_data
+from Constants.sheetConstants import *
 
 
 def get_sleep_graph(startdate, enddate):
@@ -40,12 +41,13 @@ def get_sleep_graph(startdate, enddate):
     fig.add_vrect(x0=mid_time_1, x1=initial_time, row="all", col=1,
               annotation_text="", annotation_position="top left",
               fillcolor="green", opacity=0.25, line_width=0)
+    fig.update_layout(template=THEME)
     return fig;
 
 layout = html.Div(
     id = 'Sleep-display-value',
     children=[
-        html.Hr(style={'padding-top':"30px"}),  # horizontal line
+        html.Hr(),  # horizontal line
         html.H3(children='Sleep Data'),
         html.Div(children = [
             dcc.DatePickerRange(
@@ -54,7 +56,8 @@ layout = html.Div(
                 max_date_allowed=date.today(),
                 initial_visible_month=date.today(),
                 start_date = date.today() - timedelta(7),
-                end_date= date.today()
+                end_date= date.today(),
+                className="dash-bootstrap"
             ),
             dbc.RadioItems(
                 id="sleep-data-range",

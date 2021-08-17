@@ -5,6 +5,7 @@ from .reading import layout as reading
 from .bullets import layout as bullets
 from .sleep import layout as sleep
 from .Categories import layout as category
+from index import app
 
 layout = html.Div(
     id="main-layout",
@@ -19,3 +20,5 @@ layout = html.Div(
 
 def create_bar_graph():
     return layout
+
+

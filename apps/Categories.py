@@ -14,27 +14,9 @@ import pandas as pd
 from index import app
 from .sheetService import get_ranged_sheet_data
 from .misc import *
+from Constants.sheetConstants import *
 
-CATEGORIES = {
-    # "Eating" always comes with other activity like Film, music, Friends
-    # Hence, It should'nt be quantified in time duration
-    "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep", "Office call", "office Work"],
-    "Actions": ["Inside Task", "Outside Task", "Travel"],
-    "Pseudo Leisure": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate", "Film", "Youtube", "Music", ],
-    "Learning": ["Research", "Information", "Study", "Coding", "Sketch", "Ukulele", "Read", "Meditation", "Plants", "Writing", "Time Tracker", "Expense", "Thinking"],
-    "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"]
-}
-# CATEGORIES_temp = {
-#     "Fundamental": ["Sleep", "Exercise", "Extra", "Not-Sleep"],
-#     "Actions": ["Inside Task", "Outside Task", "Travel"],
-#     "Work": ["Office call", "office Work"],
-#     "Skills": ["Sketch", "Ukulele", "Read", "Meditation", "Plants"],
-#     "Compulsive": ["Compulsive", "Nicotine", "Social Media", "Nothing", "Masturbate"],
-#     "Entertainment": ["Film", "Youtube", "Music"],
-#     "Learning": ["Research", "Information", "Study", "Coding"],
-#     "Writing": ["Writing", "Time Tracker", "Expense", "Thinking"]
-#     "People": ["Phone Call", "Text Chat", "Friends", "Family", "Conversation"]
-# }
+
 def get_Category_graph(startdate, enddate):
     Category_df = get_ranged_sheet_data(startdate, enddate);
 
@@ -75,6 +57,9 @@ def get_Category_graph(startdate, enddate):
     fig2.update_traces(rotation=180) 
     fig.add_trace(fig1['data'][0], row=1, col=1)
     fig.add_trace(fig2['data'][0], row=1, col=2)
+    fig1.update_layout(template=THEME)
+    fig1.update_layout(template=THEME)
+    fig.update_layout(template=THEME)
     fig.update_layout(margin=dict(t=10, b=10, r=10, l=10))
     return fig;
 
@@ -82,7 +67,7 @@ def get_Category_graph(startdate, enddate):
 layout = html.Div(
     id = 'Category-Graphs',
     children=[
-        html.Hr(style={'padding-top':"30px"}),  # horizontal line
+        html.Hr(),  # horizontal line
         html.H3(children='Life spent on things from...',className="header"),
         html.Div(children=[
             dcc.DatePickerRange(
@@ -91,7 +76,8 @@ layout = html.Div(
                 max_date_allowed=date.today(),
                 initial_visible_month=date.today(),
                 start_date = date(2021, 2, 1),
-                end_date= date.today()
+                end_date= date.today(),
+                className="dash-bootstrap"
             ),
             dbc.RadioItems(
                 id="category-data-range",

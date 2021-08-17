@@ -13,6 +13,7 @@ import numpy as np
 # Custom dependencies
 from index import app
 from .sheetService import get_ranged_sheet_data  
+from Constants.sheetConstants import *
 
 
 def get_graph_for_multiple_skills(startdate, enddate, cat):
@@ -25,6 +26,7 @@ def get_graph_for_multiple_skills(startdate, enddate, cat):
 
     ############# Creating Graphs
     fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= ", ".join(cat))
+    fig.update_layout(template="plotly_dark")
     return fig
 
 def get_graph_for_single_skills(startdate, enddate, cat):
@@ -37,18 +39,20 @@ def get_graph_for_single_skills(startdate, enddate, cat):
     # Creating Dataset
 
     fig = px.bar(read_df, x = read_df["Date"], y = read_df["Time"], title= cat[len(cat)-1])
+    fig.update_layout(template=THEME)
     return fig
 
 layout = html.Div(
     id = 'read-display-value',
     children=[
-        html.Hr(style={'padding-top':"30px"}),  # horizontal line
+        html.Hr(),  # horizontal line
         html.H3(children='Skills Data'),
         dcc.Dropdown(
             id="skills_dropdown",
             options = [ {'label': i, 'value':i} for i in ["Sketch", "Ukulele", "Music", "Read", "Coding"]],
             multi =True,
-            value = ["Read"]
+            value = ["Read"],
+            className="dash-bootstrap"
         ),
         dcc.DatePickerRange(
             id='read-date-picker',
@@ -56,7 +60,8 @@ layout = html.Div(
             max_date_allowed=date.today(),
             initial_visible_month=date.today(),
             start_date = date.today() - timedelta(7),
-            end_date= date.today()
+            end_date= date.today(),
+            className="dash-bootstrap"
         ),
         dbc.RadioItems(
                 id="read-data-range",
